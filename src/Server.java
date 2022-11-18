@@ -69,12 +69,14 @@ public class Server {
     }
 
     public void forwardSingle(String receiverId, String msg) {
-        // search for the recipient in the connected devices list.
-        // ar is the vector storing client of active users
+        //sending msg to a particular user
         synchronized (socketList) {
             try{
-                DataOutputStream toReceiver = new DataOutputStream(socketList.get(receiverId).getOutputStream());
-                sendString(msg, toReceiver);
+                //check if the person online
+                if(socketList.containsKey(receiverId)) {
+                    DataOutputStream toReceiver = new DataOutputStream(socketList.get(receiverId).getOutputStream());
+                    sendString(msg, toReceiver);
+                }
             } catch (IOException ex) {
                 print("Unable to forward message to %s:%d\n",
                         socketList.get(receiverId).getInetAddress().getHostName(), socketList.get(receiverId).getPort());
@@ -83,11 +85,15 @@ public class Server {
     }
 
     public void forwardGroup(String group, String msg) throws IOException {
+        //sending msg to a group
+        //get the group members from the group list
         String members = groupList.get(group);
         String [] member = members.split(",");
         synchronized (socketList) {
             for (int i = 0; i < member.length; i++) {
                 try {
+                    //loop over every member to send msg one by one
+                    //check if they are online
                     if (UserInfo.containsKey(member[i])) {
                         if (socketList.containsKey(member[i])) {
                             DataOutputStream toReceiver = new DataOutputStream(socketList.get(member[i]).getOutputStream());
