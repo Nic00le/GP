@@ -61,34 +61,61 @@ public class Server {
             String text = userId + ":" + str.nextToken();
 
             if(UserInfo.containsKey(receiverId)){
-                Chat(receiverId, text);
+                forwardSingle(receiverId, text);
             }else if(groupList.containsKey(receiverId)){
-                groupChat(receiverId, text);
+                forwardGroup(receiverId, text);
             }
         }
     }
 
-    public void Chat(String receiverId, String msg) throws IOException {
+    public void forwardSingle(String receiverId, String msg) {
         // search for the recipient in the connected devices list.
         // ar is the vector storing client of active users
-        if(UserInfo.containsKey(receiverId) && socketList.containsKey(receiverId)){
-            DataOutputStream toReceiver = new DataOutputStream(socketList.get(receiverId).getOutputStream());
-            sendString(msg, toReceiver);
+        synchronized (socketList) {
+            try{
+                DataOutputStream toReceiver = new DataOutputStream(socketList.get(receiverId).getOutputStream());
+                sendString(msg, toReceiver);
+            } catch (IOException ex) {
+                print("Unable to forward message to %s:%d\n",
+                        socketList.get(receiverId).getInetAddress().getHostName(), socketList.get(receiverId).getPort());
+            }
         }
     }
 
-    public void groupChat(String group, String msg) throws IOException {
+    public void forwardGroup(String group, String msg) throws IOException {
         String members = groupList.get(group);
         String [] member = members.split(",");
-        for (int i = 0; i < member.length; i++) {
-            if(UserInfo.containsKey(member[i])){
-                if(socketList.containsKey(member[i])) {
-                    DataOutputStream toReceiver = new DataOutputStream(socketList.get(member[i]).getOutputStream());
-                    sendString(msg, toReceiver);
+        synchronized (socketList) {
+            for (int i = 0; i < member.length; i++) {
+                try {
+                    if (UserInfo.containsKey(member[i])) {
+                        if (socketList.containsKey(member[i])) {
+                            DataOutputStream toReceiver = new DataOutputStream(socketList.get(member[i]).getOutputStream());
+                            sendString(msg, toReceiver);
+                        }
+                    }
+                } catch (IOException ex) {
+                    print("Unable to forward message to %s:%d\n",
+                            socketList.get(member[i]).getInetAddress().getHostName(), socketList.get(member[i]).getPort());
                 }
             }
         }
     }
+
+//    private void forward(String msg){
+//        synchronized (socketList) {
+//            for (Socket socket : socketList) {
+//                try {
+//                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+//                    out.writeInt(msg.length());
+//                    out.write(msg.getBytes(), 0, msg.length());
+//                } catch (IOException ex) {
+//                    print("Unable to forward message to %s:%d\n",
+//                            socket.getInetAddress().getHostName(), socket.getPort());
+//                }
+//            }
+//        }
+//    }
 
     private String Login(Socket clientSocket) throws IOException {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
