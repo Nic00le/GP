@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane  xmlns:fx="http://javafx.com/fxml" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="300.0" >
+   <center>
+      <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefHeight="374.0" prefWidth="460.0" BorderPane.alignment="CENTER">
+         <content>
+            <VBox fx:id="messagePane" />
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <BorderPane prefHeight="0.0" prefWidth="0.0" BorderPane.alignment="CENTER">
+         <center>
+            <TextField fx:id="txtInput" BorderPane.alignment="CENTER" />
+         </center>
+         <right>
+            <Button fx:id="btnEmoji" mnemonicParsing="false" text=":)" BorderPane.alignment="CENTER" />
+         </right>
+      </BorderPane>
+   </bottom>
+</BorderPane>
