@@ -33,10 +33,11 @@ public class Server {
                     serve(userId, clientSocket);
                 } catch (IOException ex) {
                     print("Connection drop!");
-                    synchronized (socketList) {
-                        socketList.remove(userId);
-                        System.out.println(socketList);
-                    }
+                }
+
+                synchronized (socketList) {
+                    socketList.remove(userId);
+                    System.out.println(socketList);
                 }
             });
 
